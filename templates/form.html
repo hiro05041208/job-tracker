@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="form-container">
+  <h2>{% if action == 'add' %}企業を追加{% else %}企業を編集{% endif %}</h2>
+
+  <form method="POST">
+    <div class="form-group">
+      <label for="name">企業名 *</label>
+      <input type="text" id="name" name="name" required
+             value="{{ company.name if company else '' }}"
+             placeholder="例：M3株式会社">
+    </div>
+
+    <div class="form-group">
+      <label for="status">ステータス</label>
+      <select id="status" name="status">
+        {% for s in ['未応募', 'ES提出', '面接', '内定', '不合格'] %}
+        <option value="{{ s }}" {% if company and company.status == s %}selected{% endif %}>{{ s }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="deadline">締切日</label>
+      <input type="date" id="deadline" name="deadline"
+             value="{{ company.deadline if company else '' }}">
+    </div>
+
+    <div class="form-group">
+      <label for="memo">メモ</label>
+      <textarea id="memo" name="memo" rows="3"
+                placeholder="例：GitHub URL記載済み、技術面接あり">{{ company.memo if company else '' }}</textarea>
+    </div>
+
+    <div class="form-actions">
+      <a href="/" class="btn-cancel">キャンセル</a>
+      <button type="submit" class="btn-submit">
+        {% if action == 'add' %}追加する{% else %}保存する{% endif %}
+      </button>
+    </div>
+  </form>
+</div>
+
+{% endblock %}

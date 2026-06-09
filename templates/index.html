@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="stats">
+  <div class="stat-card">
+    <span class="stat-label">登録企業数</span>
+    <span class="stat-value">{{ counts.total }}</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-label">ES提出済み</span>
+    <span class="stat-value">{{ counts.es }}</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-label">面接予定</span>
+    <span class="stat-value">{{ counts.interview }}</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-label">内定</span>
+    <span class="stat-value">{{ counts.offer }}</span>
+  </div>
+</div>
+
+<div class="toolbar">
+  <div class="filters">
+    <a href="/?sort={{ sort }}" class="chip {% if status_filter == 'all' %}active{% endif %}">すべて</a>
+    <a href="/?status=未応募&sort={{ sort }}" class="chip {% if status_filter == '未応募' %}active{% endif %}">未応募</a>
+    <a href="/?status=ES提出&sort={{ sort }}" class="chip {% if status_filter == 'ES提出' %}active{% endif %}">ES提出</a>
+    <a href="/?status=面接&sort={{ sort }}" class="chip {% if status_filter == '面接' %}active{% endif %}">面接</a>
+    <a href="/?status=内定&sort={{ sort }}" class="chip {% if status_filter == '内定' %}active{% endif %}">内定</a>
+  </div>
+  <div style="display:flex; gap:8px; align-items:center;">
+    <a href="/?status={{ status_filter }}&sort={% if sort == 'deadline' %}default{% else %}deadline{% endif %}"
+       class="btn-sort {% if sort == 'deadline' %}active{% endif %}">締切順</a>
+    <a href="/add" class="btn-add">+ 企業を追加</a>
+  </div>
+</div>
+
+{% if companies %}
+<table>
+  <thead>
+    <tr>
+      <th>企業名</th>
+      <th>ステータス</th>
+      <th>締切</th>
+      <th>メモ</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for c in companies %}
+    <tr class="row-{{ c.urgency or 'none' }}">
+      <td class="company-name">{{ c.name }}</td>
+      <td><span class="badge badge-{{ c.status }}">{{ c.status }}</span></td>
+      <td class="deadline">
+        {{ c.deadline or '—' }}
+        {% if c.days_left is not none %}
+          {% if c.days_left < 0 %}
+            <span class="days-badge past">期限切れ</span>
+          {% elif c.days_left == 0 %}
+            <span class="days-badge danger">今日！</span>
+          {% elif c.days_left <= 3 %}
+            <span class="days-badge danger">あと{{ c.days_left }}日</span>
+          {% elif c.days_left <= 7 %}
+            <span class="days-badge warning">あと{{ c.days_left }}日</span>
+          {% endif %}
+        {% endif %}
+      </td>
+      <td class="memo">{{ c.memo or '' }}</td>
+      <td class="actions">
+        <a href="/edit/{{ c.id }}" class="btn-edit">編集</a>
+        <a href="/delete/{{ c.id }}" class="btn-delete" onclick="return confirm('削除しますか？')">削除</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<div class="empty">
+  <p>企業が登録されていません。</p>
+  <a href="/add" class="btn-add">最初の企業を追加する</a>
+</div>
+{% endif %}
+
+{% endblock %}
